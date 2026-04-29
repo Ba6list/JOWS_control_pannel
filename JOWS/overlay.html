@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyBy5YRJSQll0S37G1sVbbdosrVBJdQJGYA",
+  authDomain: "jows-overlay.firebaseapp.com",
+  projectId: "jows-overlay",
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+</script>
+
+<style>
+body {
+  margin:0;
+  background:transparent;
+}
+
+.wrap {
+  width:1920px;
+  position:relative;
+}
+
+#uiBase {
+  width:1920px;
+  display:block;
+}
+
+/* =====================
+   左チーム
+===================== */
+.left {
+  position:absolute;
+  top:18px;
+  left:140px;
+}
+
+/* チーム名 */
+.left .name {
+  position:absolute;
+  left:120px;
+  top:3px;
+  font-size:28px;
+  color:white;
+  font-weight:bold;
+  white-space:nowrap;
+}
+
+/* ロゴ（チーム名の右） */
+.left .logo {
+  position:absolute;
+  left:315px;
+  top:-3px;
+  height:55px;
+}
+
+/* スコア（グレー枠） */
+.left .score {
+  position:absolute;
+  left:385px;
+  top:1px;
+  font-size:32px;
+  color:white;
+  font-weight:bold;
+}
+
+/* =====================
+   右チーム
+===================== */
+.right {
+  position:absolute;
+  top:18px;
+  right:140px;
+}
+
+/* チーム名（幅確保） */
+.right .name {
+  position:absolute;
+  right:65px;
+  top:3px;
+  font-size:28px;
+  color:white;
+  font-weight:bold;
+  white-space:nowrap;
+  text-align:right;
+}
+
+/* ロゴ（チーム名の左） */
+.right .logo {
+  position:absolute;
+  right:315px;
+  top:-3px;
+  height:55px;
+}
+
+/* スコア（グレー枠＝一番左） */
+.right .score {
+  position:absolute;
+  right:385px;
+  top:1px;
+  font-size:32px;
+  color:white;
+  font-weight:bold;
+}
+
+/* =====================
+   BAN（位置修正）
+===================== */
+.ban-left img {
+  position:absolute;
+  top:14.5px;
+  left:43px;
+  width:44px;
+  height:44px;
+}
+
+.ban-right img {
+  position:absolute;
+  top:14.5px;
+  right:43px;
+  width:44px;
+  height:44px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<!-- ベースUI -->
+<img id="uiBase" src="./UI/JOWS_template_basic.png">
+
+<!-- 左 -->
+<div class="left">
+  <img class="logo" id="logoA">
+  <div class="name" id="nameA"></div>
+  <div class="score" id="scoreA"></div>
+</div>
+
+<!-- 右 -->
+<div class="right">
+  <img class="logo" id="logoB">
+  <div class="name" id="nameB"></div>
+  <div class="score" id="scoreB"></div>
+</div>
+
+<!-- BAN -->
+<div class="ban-left"><img id="banA"></div>
+<div class="ban-right"><img id="banB"></div>
+
+</div>
+
+<script>
+const uiBase = document.getElementById("uiBase");
+const logoA = document.getElementById("logoA");
+const logoB = document.getElementById("logoB");
+const nameA = document.getElementById("nameA");
+const nameB = document.getElementById("nameB");
+const scoreA = document.getElementById("scoreA");
+const scoreB = document.getElementById("scoreB");
+const banA = document.getElementById("banA");
+const banB = document.getElementById("banB");
+
+db.collection("match").doc("current")
+.onSnapshot(doc => {
+  const d = doc.data();
+  if (!d) return;
+
+  // UI切り替え
+  if (d.mode === "escort" || d.mode === "hybrid") {
+    if (d.side === "attack_left") {
+      uiBase.src = "./UI/JOWS_template_L_attack.png";
+    } else {
+      uiBase.src = "./UI/JOWS_template_R_attack.png";
+    }
+  } else {
+    uiBase.src = "./UI/JOWS_template_basic.png";
+  }
+
+  // チーム名
+  nameA.innerText = d.teamA || "";
+  nameB.innerText = d.teamB || "";
+
+  // スコア
+  scoreA.innerText = d.scoreA ?? 0;
+  scoreB.innerText = d.scoreB ?? 0;
+
+  // ロゴ
+  logoA.src = d.teamA ? "./Team_Logo/" + d.teamA + "_logo.png" : "";
+  logoB.src = d.teamB ? "./Team_Logo/" + d.teamB + "_logo.png" : "";
+
+  // BAN
+  banA.src = d.banA ? "./icon/" + d.banA + ".png" : "";
+  banB.src = d.banB ? "./icon/" + d.banB + ".png" : "";
+});
+</script>
+
+</body>
+</html>

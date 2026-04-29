@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "jows-overlay.firebaseapp.com",
+  projectId: "jows-overlay",
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+</script>
+
+<style>
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:linear-gradient(135deg,#2b2b2b,#3a3a3a);
+}
+
+/* =====================
+   ヘッダー
+===================== */
+.header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:20px 30px;
+  color:white;
+  font-size:26px;
+}
+
+/* =====================
+   レイアウト
+===================== */
+.container{
+  display:grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap:30px;
+  padding:0 30px 30px;
+}
+
+/* =====================
+   カード
+===================== */
+.card{
+  background:#f5f5f5;
+  border-radius:30px;
+  padding:30px;
+  box-shadow:0 10px 30px rgba(255,0,0,0.2);
+}
+
+/* =====================
+   UIモード
+===================== */
+.mode{
+  display:flex;
+  align-items:center;
+  gap:20px;
+}
+
+.modeBtns{
+  display:flex;
+  gap:12px;
+}
+
+.modeBtn{
+  padding:10px 30px;
+  border-radius:25px;
+  border:none;
+  background:#ccc;
+  cursor:pointer;
+  transition:.2s;
+  font-weight:bold;
+}
+
+.modeBtn.active{
+  background:#d9df9c;
+  box-shadow:0 3px 10px rgba(0,0,0,.2);
+}
+
+/* =====================
+   アクションボタン
+===================== */
+.actions{
+  margin-top:25px;
+  display:flex;
+  gap:20px;
+}
+
+.btn{
+  padding:12px 35px;
+  border:none;
+  border-radius:25px;
+  cursor:pointer;
+  font-weight:bold;
+  transition:.15s;
+}
+
+.swap{ background:#9fd4d9;}
+.reset{ background:#e2a3a3;}
+
+.btn:active{
+  transform:scale(.95);
+}
+
+.btn.flash{
+  animation:flash .25s;
+}
+
+@keyframes flash{
+  0%{filter:brightness(1)}
+  50%{filter:brightness(1.6)}
+  100%{filter:brightness(1)}
+}
+
+/* =====================
+   スコア
+===================== */
+.scoreArea{
+  margin-top:60px;
+  display:flex;
+  justify-content:center;
+  gap:120px;
+}
+
+.scoreBox{
+  background:#ddd;
+  padding:40px 70px;
+  border-radius:20px;
+  text-align:center;
+}
+
+.scoreRow{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:20px;
+}
+
+.scoreNum{
+  font-size:64px;
+  font-weight:bold;
+}
+
+.scoreBtn{
+  width:45px;
+  height:45px;
+  border:none;
+  border-radius:8px;
+  background:white;
+  font-size:20px;
+  cursor:pointer;
+}
+
+.scoreBtn:active{
+  transform:scale(.9);
+  background:#ccc;
+}
+
+/* =====================
+   チームカード
+===================== */
+.teamCard{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.teamInputs{
+  width:70%;
+}
+
+.input{
+  width:100%;
+  padding:14px 20px;
+  border-radius:25px;
+  border:none;
+  margin-top:10px;
+  font-size:16px;
+}
+
+.teamInput{ background:#cfd6f5;}
+.banInput{ background:#f1b5b5;}
+
+.logo{
+  width:120px;
+  height:120px;
+  object-fit:contain;
+}
+
+/* =====================
+   ドロップダウン
+===================== */
+.dropdown{
+  position:relative;
+}
+
+.dropdownList{
+  position:absolute;
+  top:50px;
+  width:100%;
+  background:white;
+  border-radius:12px;
+  max-height:220px;
+  overflow-y:auto;
+  display:none;
+  z-index:10;
+}
+
+.dropdownItem{
+  padding:12px;
+  cursor:pointer;
+}
+
+.dropdownItem:hover{
+  background:#eee;
+}
+
+.copyright{
+  position:fixed;
+  bottom:10px;
+  right:750px;;
+  font-size:15px;
+  color:rgb(255, 255, 255);
+  font-weight:500;
+  pointer-events:none;
+  z-index:9999;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <img src="./JOWS.png" height="40">
+  JOWS 配信UI管理画面 β版
+</div>
+
+<div class="container">
+
+<!-- 左 -->
+<div class="card">
+
+<div class="mode">
+  UIモード
+  <div class="modeBtns">
+    <button id="normalBtn" class="modeBtn active">ノーマル</button>
+    <button id="optionBtn" class="modeBtn">オプション</button>
+  </div>
+</div>
+
+<div class="actions">
+  <button id="swapBtn" class="btn swap">攻守入れ替え</button>
+  <button id="resetBtn" class="btn reset">全てリセット</button>
+</div>
+
+<div class="scoreArea">
+
+<div class="scoreBox">
+  <div class="scoreRow">
+    <button class="scoreBtn" onclick="score('A',-1)">-</button>
+    <div id="scoreA" class="scoreNum">0</div>
+    <button class="scoreBtn" onclick="score('A',1)">+</button>
+  </div>
+  <div>Team A</div>
+</div>
+
+<div class="scoreBox">
+  <div class="scoreRow">
+    <button class="scoreBtn" onclick="score('B',-1)">-</button>
+    <div id="scoreB" class="scoreNum">0</div>
+    <button class="scoreBtn" onclick="score('B',1)">+</button>
+  </div>
+  <div>Team B</div>
+</div>
+
+</div>
+
+</div>
+
+<!-- 右 -->
+<div>
+
+<div class="card teamCard">
+  <div class="teamInputs">
+
+    チーム名
+    <div class="dropdown">
+      <input id="teamA" class="input teamInput" onclick="openList('teamListA')">
+      <div id="teamListA" class="dropdownList"></div>
+    </div>
+
+    BAN
+    <div class="dropdown">
+      <input id="banA" class="input banInput" onclick="openList('heroListA')">
+      <div id="heroListA" class="dropdownList"></div>
+    </div>
+
+    Team A
+  </div>
+
+  <img id="logoA" class="logo">
+</div>
+
+<div class="card teamCard" style="margin-top:20px;">
+  <div class="teamInputs">
+
+    チーム名
+    <div class="dropdown">
+      <input id="teamB" class="input teamInput" onclick="openList('teamListB')">
+      <div id="teamListB" class="dropdownList"></div>
+    </div>
+
+    BAN
+    <div class="dropdown">
+      <input id="banB" class="input banInput" onclick="openList('heroListB')">
+      <div id="heroListB" class="dropdownList"></div>
+    </div>
+
+    Team B
+  </div>
+
+  <img id="logoB" class="logo">
+</div>
+
+</div>
+
+</div>
+
+<script>
+
+/* データ */
+const teams=["AIMCORE","Foram","Cat Foot","Killer-Bee","モルテンコア","Konamono Gaming","AnaFururuGaming","腹2"];
+
+const heroes=["Ana","anran","Ashe","Baptiste","Bastion","Brigitte","Cassidy","D.va","domina","Doomfist","Echo","emre","Freja","Genji","Hanzo","Hazard","Illari","jetpackcat","Junker_Queen","Junkrat","Juno","Kiriko","Lifeweaver","Lucio","Mauga","Mei","Mercy","mizuki","Moira","Orisa","Pharah","Ramattra","Reaper","Reinhardt","Roadhog","Sigma","Sojourn","Soldier","Sombra","Symmetra","Torbjorn","Tracer","Vendetta","Venture","Widow","Winston","Wrecking_Ball","Wuyang","Zarya","Zeniyatta"];
+
+/* dropdown */
+function createList(id,data,inputId){
+  const list=document.getElementById(id);
+
+  function render(f=""){
+    list.innerHTML="";
+    data.filter(v=>v.toLowerCase().includes(f.toLowerCase()))
+    .forEach(v=>{
+      const d=document.createElement("div");
+      d.className="dropdownItem";
+      d.innerText=v;
+      d.onclick=()=>{
+        document.getElementById(inputId).value=v;
+        list.style.display="none";
+        update();
+      };
+      list.appendChild(d);
+    });
+  }
+
+  render();
+  document.getElementById(inputId).addEventListener("input",e=>render(e.target.value));
+}
+
+createList("teamListA",teams,"teamA");
+createList("teamListB",teams,"teamB");
+createList("heroListA",heroes,"banA");
+createList("heroListB",heroes,"banB");
+
+function openList(id){
+  document.querySelectorAll(".dropdownList").forEach(e=>e.style.display="none");
+  document.getElementById(id).style.display="block";
+}
+
+/* DOM */
+const teamAInput=document.getElementById("teamA");
+const teamBInput=document.getElementById("teamB");
+const banAInput=document.getElementById("banA");
+const banBInput=document.getElementById("banB");
+const logoA=document.getElementById("logoA");
+const logoB=document.getElementById("logoB");
+
+/* 更新 */
+function update(extra={}){
+  const teamA=teamAInput.value;
+  const teamB=teamBInput.value;
+
+  logoA.src="./Team_Logo/"+teamA+"_logo.png";
+  logoB.src="./Team_Logo/"+teamB+"_logo.png";
+
+  if(teamA==="Konamono Gaming") logoA.src="./Team_Logo/"+teamA+"_logo.jpg";
+  if(teamB==="Konamono Gaming") logoB.src="./Team_Logo/"+teamB+"_logo.jpg";
+
+  db.collection("match").doc("current").set({
+    teamA,
+    teamB,
+    banA:banAInput.value,
+    banB:banBInput.value,
+    ...extra
+  },{merge:true});
+}
+
+/* スコア */
+let a=0,b=0;
+function score(t,v){
+  if(t==="A"){a=Math.max(0,a+v);scoreA.innerText=a;update({scoreA:a});}
+  else{b=Math.max(0,b+v);scoreB.innerText=b;update({scoreB:b});}
+}
+
+/* モード */
+normalBtn.onclick=()=>{
+  normalBtn.classList.add("active");
+  optionBtn.classList.remove("active");
+  update({mode:"control"});
+};
+
+optionBtn.onclick=()=>{
+  optionBtn.classList.add("active");
+  normalBtn.classList.remove("active");
+  update({mode:"escort"});
+};
+
+/* フィードバック */
+function flash(el){
+  el.classList.add("flash");
+  setTimeout(()=>el.classList.remove("flash"),250);
+}
+
+swapBtn.onclick=(e)=>{
+  flash(e.target);
+  update({side:"swap"});
+};
+
+resetBtn.onclick=(e)=>{
+  flash(e.target);
+  a=0;b=0;
+  scoreA.innerText=0;
+  scoreB.innerText=0;
+  update({scoreA:0,scoreB:0});
+};
+
+
+</script>
+
+<div class="copyright">
+  ©JOWS Created by Ba6list
+</div>
+
+</body>
+</html>
