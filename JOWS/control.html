@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -21,6 +22,73 @@ body{
   margin:0;
   font-family:sans-serif;
   background:linear-gradient(135deg,#2b2b2b,#3a3a3a);
+}
+
+  /* =====================
+   レスポンシブ
+===================== */
+@media (max-width: 900px){
+
+  .container{
+    grid-template-columns: 1fr;
+  }
+
+  .header{
+    font-size:20px;
+    padding:15px 20px;
+  }
+
+  .card{
+    padding:20px;
+    border-radius:20px;
+  }
+
+  .scoreArea{
+    flex-direction:column;
+    gap:30px;
+    margin-top:40px;
+  }
+
+  .scoreBox{
+    padding:30px;
+  }
+
+  .scoreNum{
+    font-size:48px;
+  }
+
+  .teamCard{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:15px;
+  }
+
+  .teamInputs{
+    width:100%;
+  }
+
+  .logo{
+    width:80px;
+    height:80px;
+    align-self:flex-end;
+  }
+
+  .actions{
+    flex-direction:column;
+    gap:12px;
+  }
+
+  .mode{
+    flex-direction:column;
+    align-items:flex-start;
+    gap:10px;
+  }
+
+  .copyright{
+    right:10px;
+    bottom:10px;
+    font-size:12px;
+  }
 }
 
 /* =====================
