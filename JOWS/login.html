@@ -168,8 +168,14 @@ function login(){
 
   if(id === "admin" && pass === "JOWS"){
 
+    // 🔐 今ログインしてる状態
+    localStorage.setItem("login","true");
+
+    // 💾 端末記憶
     if(remember){
       localStorage.setItem("jows_login","true");
+    }else{
+      localStorage.removeItem("jows_login");
     }
 
     location.href = "control.html";
@@ -179,14 +185,15 @@ function login(){
   }
 }
 
+
 // 🔁 自動ログイン
 window.onload = ()=>{
   if(localStorage.getItem("jows_login") === "true"){
+    localStorage.setItem("login","true"); // ←ここ重要（セッション復元）
     location.href = "control.html";
   }
 };
 
 </script>
-
 </body>
 </html>
