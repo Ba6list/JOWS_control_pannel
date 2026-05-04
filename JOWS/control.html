@@ -393,6 +393,11 @@ body{
 
 <script>
 
+function logout(){
+localStorage.removeItem("login"); // ログイン状態削除
+window.location.href = "login.html"; // ログイン画面へ
+}
+
 /* データ */
 const teams=["AIMCORE","Foram","Cat Foot","Killer-Bee","モルテンコア","Konamono","AnaFururu","腹2"];
 
