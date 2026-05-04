@@ -187,6 +187,36 @@ db.collection("match").doc("current")
     uiBase.src = "./UI/JOWS_template_basic.png";
   }
 
+  // ===== 位置調整 =====
+if (d.mode === "escort" || d.mode === "hybrid") {
+
+  // 左チーム
+  document.querySelector(".left").style.left = "87px";
+
+  // 右チーム
+  document.querySelector(".right").style.right = "87px";
+
+} else {
+
+  document.querySelector(".left").style.left = "140px";
+  document.querySelector(".right").style.right = "140px";
+
+
+}
+
+// ===== チーム名だけ微調整 =====
+if (d.mode === "escort" || d.mode === "hybrid") {
+
+  document.querySelector(".left .name").style.left = "190px";
+  document.querySelector(".right .name").style.right = "190px";
+
+} else {
+
+  document.querySelector(".left .name").style.left = "150px";
+  document.querySelector(".right .name").style.right = "150px";
+
+}
+
   // チーム名
   nameA.innerText = d.teamA || "";
   nameB.innerText = d.teamB || "";
