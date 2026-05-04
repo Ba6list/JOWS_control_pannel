@@ -16,6 +16,12 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 </script>
 
+<script>
+if(localStorage.getItem("login") !== "true"){
+  location.href = "login.html";
+}
+</script>
+
 <style>
 body{
   margin:0;
