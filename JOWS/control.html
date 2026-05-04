@@ -24,8 +24,9 @@ body{
 }
 
 /* =====================
-   ヘッダー
+   ヘッダー修正（←追加）
 ===================== */
+
 .header{
   display:flex;
   align-items:center;
@@ -33,6 +34,43 @@ body{
   padding:20px 30px;
   color:white;
   font-size:26px;
+  position:relative; /* ←追加 */
+}
+
+.header{
+  display:flex;
+  justify-content:space-between; /* ←これが超重要 */
+  align-items:center;
+  padding:20px 40px;
+}
+
+/* 左側 */
+.headerLeft{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* 右側 */
+.headerRight{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+/* ボタン */
+.headerBtn{
+  background:#e5e5e5;
+  border:none;
+  border-radius:25px;
+  padding:8px 20px;
+  font-size:14px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.headerBtn:hover{
+  background:#dcdcdc;
 }
 
 /* =====================
@@ -247,8 +285,19 @@ body{
 <body>
 
 <div class="header">
-  <img src="./JOWS.png" height="40">
-  JOWS 配信UI管理画面 β版 <span class="version">ver1.1</span>
+
+  <!-- 左 -->
+  <div class="headerLeft">
+    <img src="./JOWS.png" height="40">
+    JOWS 配信UI管理画面 β版 <span class="version">ver1.1</span>
+  </div>
+
+  <!-- 右 -->
+  <div class="headerRight">
+    <button class="headerBtn" onclick="logout()">ログアウト</button>
+    <button id="saveBtn" class="headerBtn">保存</button>
+  </div>
+
 </div>
 
 <div class="container">
@@ -521,17 +570,7 @@ window.onload = () => {
 };
 </script>
 
-<button id="saveBtn" class="btn" style="
-position:absolute;
-top:30px;
-right:40px;
-background:#ddd;
-border-radius:25px;
-padding:12px 40px;
-font-weight:bold;
-">
-保存
-</button>
+
 
 <div class="copyright">
   ©JOWS Created by Ba6list
